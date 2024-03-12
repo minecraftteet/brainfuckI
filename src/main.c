@@ -8,10 +8,55 @@ int8_t errorflag = 0;
 FILE *srcFile;
 int main(int argc, char *argv[]) {
   if (argv[1] == NULL) {
-    errorflag = -1;
-    printf("you must have a file as a arg\n");
-    return errorflag;
+  int readPoint =0;
+  uint tape[900] ={0};
+  int tapePoint =0;
+  char command[1000];
+  while (command[readPoint--] != 'e') {
+    printf("bfsh: ");
+    scanf("%s",command);
+    for (readPoint = 0 ; command[readPoint] != '\0';readPoint++) {
+
+    if (command[readPoint] == '<') {
+      if (tapePoint != -1) {
+        fclose(srcFile);
+        printf("you are going to low");
+        errorflag = -1;
+        return errorflag;
+      }else {
+        tapePoint--;
+      }
+    }
+    if (command[readPoint] == '>') {
+      if (tapePoint == sizeof(tape)) {
+        fclose(srcFile);
+        printf("you are going to high");
+        errorflag = -1;
+        return errorflag;
+      }else {
+        tapePoint++;
+      }
+    }
+    if (command[readPoint] == '+') {
+        tape[tapePoint]++;
+    }
+    if (command[readPoint] == '^') {
+        printf("%d\n",tape[tapePoint]);
+
+    }
+    if (command[readPoint] == '!') {
+        if (tape[tapePoint]==1) {
+          system("ls");
+        }
+        if (tape[tapePoint]==2) {
+          system("echo hello,would!");
+        }
+    }
   }
+}
+  }
+  else {
+
   srcFile = fopen(argv[1], "r");
   char buffer[300000];
   while (!feof(srcFile)) {
@@ -62,4 +107,5 @@ int main(int argc, char *argv[]) {
 
   fclose(srcFile);
   return errorflag;
+}
 }
