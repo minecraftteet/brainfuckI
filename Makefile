@@ -4,14 +4,23 @@
 # @file
 # @version 0.1
 
-all: install
+all: clean
 
-brainfuckI: ./src/main.c
-	clang -o brainfuckI ./src/main.c
+brainfuckI: src/main.c src/shell.c src/parser.c
+	clang -o brainfuckI src/main.c src/shell.c src/parser.c
+
+run: brainfuckI
+	./brainfuckI
+
+test: brainfuckI
+	./brainfuckI ./src/test.bf
 
 install: brainfuckI
 	sudo mv brainfuckI /bin
 	brainfuckI ./src/test.bf
 
+
+clean: run
+	rm brainfuckI
 
 # end
