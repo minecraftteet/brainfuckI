@@ -10,69 +10,27 @@
 
 
 int parsbf(char *fileName){
-    FILE *srcFile;
+  FILE *srcFile;
+  int buffer_len = 300000;
   srcFile = fopen(fileName, "r");
-  char buffer[300000];
+  char *buffer = malloc(buffer_len);
+
   while (!feof(srcFile)) {
-    fread(buffer, sizeof(buffer), 1, srcFile);
+
+    fread(buffer, buffer_len, 1, srcFile);
+
   }
+  load(fileName, buffer, buffer_len);
   BfTape tape = {
     {0},
     0,
     0
   };
-  while (buffer[tape.readPoint] != '\0') {
-    if (buffer[tape.readPoint] == '<') {
-      if (tape.tapePoint == -1) {
-        fclose(srcFile);
-        printf("you are going to low");
-        return -1;
-      }else {
-        tape.tapePoint--;
-      }
-    }
-    if (buffer[tape.readPoint] == '>') {
-      if (tape.tapePoint == sizeof(tape)) {
-        fclose(srcFile);
-        printf("you are going to high");
-        return -1;
-      }else {
-        tape.tapePoint++;
-      }
-    }
-    if (buffer[tape.readPoint] == '+') {
-        tape.tape[tape.tapePoint]++;
-    }
-    if (buffer[tape.readPoint] == '-') {
-        tape.tape[tape.tapePoint]--;
-    }
-    if (buffer[tape.readPoint] == '^') {
-        printf("%d",tape.tape[tape.tapePoint]);
-    }
-    if (buffer[tape.readPoint] == '~') {
-      for (int offset=1; tape.tape[tape.tapePoint - offset] != 0;offset++){
-        char letter = tape.tape[tape.tapePoint + offset];
-      printf("%c",letter);
-      }
-      printf("\n");
-    }
 
-    if (buffer[tape.readPoint] == 'e') {
-      exit(0);
-      }
-    if (buffer[tape.readPoint] == '!') {
-        if (tape.tape[tape.tapePoint]==1 && tape.tape[tape.tapePoint+= 1]==2) {
-          system("ls");
-        }
-        if (tape.tape[tape.tapePoint]==2 && tape.tape[tape.tapePoint+= 1]==1) {
-          system("echo hello,would!");
-        }
-    }
-    tape.readPoint++;
-  }
+  BfFileHandle(tape,buffer,srcFile);
   printf("\n");
 
-
+  free(buffer);
   fclose(srcFile);
   return 0;
 }
