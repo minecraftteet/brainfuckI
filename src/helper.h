@@ -21,7 +21,7 @@ typedef struct {
   char*buffer;
   size_t len;
 } File_buf;
-static char *load(char *fileName, char *buffer,size_t buffer_len,int bufferOffSet)
+static char *load(char *fileName, char *buffer,size_t buffer_len,int **bufferOffSet)
 {
   FILE *srcFile = fopen(fileName, "r");
   size_t bufferSize = 1024;
@@ -46,7 +46,6 @@ static char *load(char *fileName, char *buffer,size_t buffer_len,int bufferOffSe
   return buffer;
 }
 static int BfFileHandle(BfTape tape, char *buffer,FILE *srcFile){
-
   while (buffer[tape.readPoint] != '\0') {
     switch (buffer[tape.readPoint]) {
       case '<':
