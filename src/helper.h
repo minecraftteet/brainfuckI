@@ -1,3 +1,4 @@
+#include <bits/types/FILE.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,16 +22,18 @@ typedef struct {
   char*buffer;
   size_t len;
 } File_buf;
-static char *load(char *fileName, char *buffer,size_t buffer_len,int **bufferOffSet)
+static char *load(char *fileName, char **buffer)
 {
   FILE *srcFile = fopen(fileName, "r");
+  size_t buffer_len = 1024;
   size_t bufferSize = 1024;
+
 
   char * ptr1, *ptr2;
   char inportFile[128];
-  while ((getline(&buffer, &bufferSize, srcFile)) > 0) {
-    if (strstr(buffer, "load")) {
-      ptr1 = strchr(buffer, '\"');
+  while ((getline(buffer, &bufferSize, srcFile)) > 0) {
+    if (strstr(*buffer, "load")) {
+      ptr1 = strchr(*buffer, '\"');
       ptr2 = strchr(ptr1 + 1, '\"');
       strncpy(inportFile, ptr1 + 1, ptr2 - ptr1 - 1);
       FILE *f = fopen(inportFile, "r");
@@ -38,12 +41,10 @@ static char *load(char *fileName, char *buffer,size_t buffer_len,int **bufferOff
 
 
         fread(buffer, buffer_len, 1,f);
-        bufferOffSet++;
       }
     }
   }
-
-  return buffer;
+  return *buffer;
 }
 static int BfFileHandle(BfTape tape, char *buffer,FILE *srcFile){
   while (buffer[tape.readPoint] != '\0') {

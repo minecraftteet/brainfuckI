@@ -9,18 +9,20 @@
 
 
 
-int parsbf(char *fileName){
+int parsbf(char *fileName, char *inpoutfile ){
   FILE *srcFile;
   int buffer_len = 300000;
   srcFile = fopen(fileName, "r");
   char *buffer = malloc(buffer_len);
+
+
+  if
 
   while (!feof(srcFile)) {
 
     fread(buffer, buffer_len, 1, srcFile);
 
   }
-  load(fileName, buffer, buffer_len);
   BfTape tape = {
     {0},
     0,
