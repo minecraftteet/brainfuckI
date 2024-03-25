@@ -1,3 +1,7 @@
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_render.h>
+#include <SDL2/SDL_sensor.h>
+#include <SDL2/SDL_video.h>
 #include <bits/types/FILE.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -5,6 +9,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
+#include <SDL2/SDL.h>
 /*
   this is a helper file for  */
 
@@ -12,16 +17,29 @@
 
 
 typedef struct {
-
-  uint tape[900];
-  int tapePoint;
-  int readPoint;
+  Uint8 tape[900];
+  int tapePoint; //the point in the tape
+  int readPoint; // point in the file
 
 }BfTape;
+typedef struct {
+  SDL_Renderer *rend;
+  SDL_Window *wend;
+
+}SDLDEF;
 typedef struct {
   char*buffer;
   size_t len;
 } File_buf;
+
+static void setupsdl(SDLDEF comp)
+{
+  SDL_Init(SDL_INIT_EVERYTHING);
+  SDL_Window *wind = SDL_CreateWindow("brainFuck",0,0,800,600,SDL_WINDOW_BORDERLESS);
+  SDL_Renderer *rend = SDL_CreateRenderer(wind,-1,0);
+  comp.rend = rend;
+  comp.wend = wind;
+}
 static char *load(char *fileName, char **buffer)
 {
   FILE *srcFile = fopen(fileName, "r");
@@ -47,6 +65,7 @@ static char *load(char *fileName, char **buffer)
   return *buffer;
 }
 static int BfFileHandle(BfTape tape, char *buffer,FILE *srcFile){
+SDLDEF display;
   while (buffer[tape.readPoint] != '\0') {
     switch (buffer[tape.readPoint]) {
       case '<':
@@ -74,7 +93,7 @@ static int BfFileHandle(BfTape tape, char *buffer,FILE *srcFile){
       tape.tape[tape.tapePoint]++;
       break;
     case '^':
-      printf("%d",tape.tape[tape.tapePoint]);
+      printf("%d \t",tape.tape[tape.tapePoint]);
       break;
     case '~':
       for (int offset=1; tape.tape[tape.tapePoint - offset] != 0;offset++){
@@ -93,6 +112,25 @@ static int BfFileHandle(BfTape tape, char *buffer,FILE *srcFile){
       if (tape.tape[tape.tapePoint]==2 && tape.tape[tape.tapePoint+= 1]==1) {
         system("echo hello,would!");
       }
+      if (tape.tape[tape.tapePoint]==4 && tape.tape[tape.tapePoint+= 1]==1) {
+        setupsdl(display);
+      }
+      if (tape.tape[tape.tapePoint]==4 && tape.tape[tape.tapePoint+= 1]==2) {
+        SDL_RenderClear(display.rend);
+      }
+      if (tape.tape[tape.tapePoint]==4 && tape.tape[tape.tapePoint+= 1]==3) {
+        SDL_RenderPresent(display.rend);
+      }
+      if (tape.tape[tape.tapePoint]==4 && tape.tape[tape.tapePoint+= 1]==4) {
+        SDL_SetRenderDrawColor(display.rend,tape.tape[tape.tapePoint+= 2],tape.tape[tape.tapePoint+= 3],
+                               tape.tape[tape.tapePoint+= 4], tape.tape[tape.tapePoint+= 5]);
+      }
+
+
+      if (tape.tape[tape.tapePoint]==4 && tape.tape[tape.tapePoint+= 1]==10) {
+        SDL_DestroyRenderer(display.rend);
+        SDL_DestroyWindow(display.wend);
+        }
       break;
     default:
       break;
@@ -106,3 +144,5 @@ typedef struct {
   uint tape[900];
   int tapePoint;
 }BfSh;
+
+

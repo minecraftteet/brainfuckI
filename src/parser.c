@@ -9,14 +9,11 @@
 
 
 
-int parsbf(char *fileName, char *inpoutfile ){
+int parsbf(char *fileName){
   FILE *srcFile;
   int buffer_len = 300000;
   srcFile = fopen(fileName, "r");
   char *buffer = malloc(buffer_len);
-
-
-  if
 
   while (!feof(srcFile)) {
 

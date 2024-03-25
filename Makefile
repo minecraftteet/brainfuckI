@@ -7,7 +7,7 @@
 all: clean
 
 brainfuckI: src/main.c src/shell.c src/parser.c
-	clang -o brainfuckI src/main.c src/shell.c src/parser.c
+	clang -o brainfuckI src/main.c src/shell.c src/parser.c -lSDL2
 
 run: brainfuckI
 	./brainfuckI
