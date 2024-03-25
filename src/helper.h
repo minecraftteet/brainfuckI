@@ -68,6 +68,39 @@ static int BfFileHandle(BfTape tape, char *buffer,FILE *srcFile){
 SDLDEF display;
   while (buffer[tape.readPoint] != '\0') {
     switch (buffer[tape.readPoint]) {
+case '[':
+    if (tape.tape[tape.tapePoint] == 0) {
+        int loopDepth = 1;
+        while (loopDepth != 0) {
+            tape.readPoint++;
+            if (buffer[tape.readPoint] == '[') {
+                loopDepth++;
+            } else if (buffer[tape.readPoint] == ']') {
+                loopDepth--;
+            }
+        }
+    } else {
+        // If the current tape position is non-zero, continue execution
+        tape.readPoint++;
+    }
+    break;
+
+case ']':
+    if (tape.tape[tape.tapePoint] != 0) {
+        int loopDepth = 1;
+        while (loopDepth != 0) {
+            tape.readPoint--;
+            if (buffer[tape.readPoint] == '[') {
+                loopDepth--;
+            } else if (buffer[tape.readPoint] == ']') {
+                loopDepth++;
+            }
+        }
+    } else {
+        // If the current tape position is zero, continue execution
+        tape.readPoint++;
+    }
+    break;
       case '<':
         if (tape.tapePoint == -1) {
           fclose(srcFile);
@@ -93,7 +126,7 @@ SDLDEF display;
       tape.tape[tape.tapePoint]++;
       break;
     case '^':
-      printf("%d \t",tape.tape[tape.tapePoint]);
+      printf(" %d regster->%d \t",tape.tapePoint,tape.tape[tape.tapePoint]);
       break;
     case '~':
       for (int offset=1; tape.tape[tape.tapePoint - offset] != 0;offset++){
@@ -106,31 +139,39 @@ SDLDEF display;
       exit(0);
       break;
     case '!':
-      if (tape.tape[tape.tapePoint]==1 && tape.tape[tape.tapePoint+= 1]==2) {
-        system("ls");
-      }
-      if (tape.tape[tape.tapePoint]==2 && tape.tape[tape.tapePoint+= 1]==1) {
-        system("echo hello,would!");
-      }
-      if (tape.tape[tape.tapePoint]==4 && tape.tape[tape.tapePoint+= 1]==1) {
-        setupsdl(display);
-      }
-      if (tape.tape[tape.tapePoint]==4 && tape.tape[tape.tapePoint+= 1]==2) {
-        SDL_RenderClear(display.rend);
-      }
-      if (tape.tape[tape.tapePoint]==4 && tape.tape[tape.tapePoint+= 1]==3) {
-        SDL_RenderPresent(display.rend);
-      }
-      if (tape.tape[tape.tapePoint]==4 && tape.tape[tape.tapePoint+= 1]==4) {
-        SDL_SetRenderDrawColor(display.rend,tape.tape[tape.tapePoint+= 2],tape.tape[tape.tapePoint+= 3],
-                               tape.tape[tape.tapePoint+= 4], tape.tape[tape.tapePoint+= 5]);
-      }
-
-
-      if (tape.tape[tape.tapePoint]==4 && tape.tape[tape.tapePoint+= 1]==10) {
-        SDL_DestroyRenderer(display.rend);
-        SDL_DestroyWindow(display.wend);
+      switch (tape.tape[tape.tapePoint]) {
+      case 1:
+        if (tape.tape[tape.tapePoint+= 1]==2) {
+          system("ls");
         }
+        break;
+      case 2:
+        if (tape.tape[tape.tapePoint]==2 && tape.tape[tape.tapePoint+= 1]==1) {
+          system("echo hello,would!");
+        }
+        break;
+        case 4:
+          if (tape.tape[tape.tapePoint+= 1]==1) {
+            setupsdl(display);
+          }
+          if (tape.tape[tape.tapePoint+= 1]==2) {
+            SDL_RenderClear(display.rend);
+          }
+          if (tape.tape[tape.tapePoint+= 1]==3) {
+            SDL_RenderPresent(display.rend);
+          }
+          if (tape.tape[tape.tapePoint+= 1]==4) {
+            SDL_SetRenderDrawColor(display.rend,tape.tape[tape.tapePoint+= 2],tape.tape[tape.tapePoint+= 3],
+                                   tape.tape[tape.tapePoint+= 4], tape.tape[tape.tapePoint+= 5]);
+          }
+          if (tape.tape[tape.tapePoint+= 1]==10) {
+            SDL_DestroyRenderer(display.rend);
+            SDL_DestroyWindow(display.wend);
+          }
+          break;
+      default:
+        break;
+      }
       break;
     default:
       break;
